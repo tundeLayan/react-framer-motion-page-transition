@@ -1,58 +1,149 @@
-import React from "react";
+import React, { useEffect, useState } from 'react'
+
+import { motion, useViewportScroll, useTransform } from 'framer-motion'
+
 //Components
-import ScrollForMore from "../components/scrollForMore";
+import ScrollForMore from '../components/scrollForMore'
 //Ease
 
-const Model = () => {
+const transition = { duration: 1.4, ease: [0.6, 0.01, -0.05, 0.96] }
+
+const firstName = {
+  animate: {
+    y: 0,
+    transition: {
+      delayChildren: 0.6,
+      staggerChildren: 0.04,
+      staggerDirection: -1,
+    },
+  },
+}
+
+const lastName = {
+  animate: {
+    y: 0,
+    transition: {
+      delayChildren: 0.6,
+      staggerChildren: 0.04,
+      staggerDirection: 1,
+    },
+  },
+}
+
+const letter = {
+  initial: {
+    y: 400,
+  },
+  animate: {
+    y: 0,
+    transition: { duration: 1, ...transition },
+  },
+}
+
+const Model = ({ imageDetails }) => {
+  const { scrollYProgress } = useViewportScroll()
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.15])
+
+  const [canScroll, setCanScroll] = useState(false)
+
+  useEffect(() => {
+    if (canScroll === false) {
+      document.querySelector('body').classList.add('no-scroll')
+    } else {
+      document.querySelector('body').classList.remove('no-scroll')
+    }
+  }, [canScroll])
+
   return (
-    <div className='single'>
-      <div className='container fluid'>
-        <div className='row center top-row'>
-          <div className='top'>
-            <div className='details'>
-              <div className='location'>
+    <motion.div
+      onAnimationComplete={() => setCanScroll(true)}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className="single"
+    >
+      <div className="container fluid">
+        <div className="row center top-row">
+          <div className="top">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                transition: { delay: 1.5, ...transition },
+              }}
+              className="details"
+            >
+              <div className="location">
                 <span>28.538336</span>
                 <span>-81.379234</span>
               </div>
-              <div className='mua'>MUA: @mylifeascrystall</div>
-            </div>
-            <div className='model'>
-              <span className='first'>
-                <span>Y</span>
-                <span>a</span>
-                <span>s</span>
-                <span>m</span>
-                <span>e</span>
-                <span>e</span>
-                <span>n</span>
-              </span>
-              <span className='last'>
-                <span>T</span>
-                <span>a</span>
-                <span>r</span>
-                <span>i</span>
-                <span>q</span>
-              </span>
-            </div>
+              <div className="mua">MUA: @mylifeascrystall</div>
+            </motion.div>
+            <motion.div className="model">
+              <motion.span variants={firstName} className="first">
+                <motion.span variants={letter}>Y</motion.span>
+                <motion.span variants={letter}>a</motion.span>
+                <motion.span variants={letter}>s</motion.span>
+                <motion.span variants={letter}>m</motion.span>
+                <motion.span variants={letter}>e</motion.span>
+                <motion.span variants={letter}>e</motion.span>
+                <motion.span variants={letter}>n</motion.span>
+              </motion.span>
+              <motion.span variants={lastName} className="last">
+                <motion.span variants={letter}>T</motion.span>
+                <motion.span variants={letter}>a</motion.span>
+                <motion.span variants={letter}>r</motion.span>
+                <motion.span variants={letter}>i</motion.span>
+                <motion.span variants={letter}>q</motion.span>
+              </motion.span>
+            </motion.div>
           </div>
         </div>
-        <div className='row bottom-row'>
-          <div className='bottom'>
-            <div className='image-container-single'>
-              <div className='thumbnail-single'>
-                <div className='frame-single'>
-                  <img src={require("../images/yasmeen.webp")} alt='an image' />
-                </div>
-              </div>
+        <div className="row bottom-row">
+          <div className="bottom">
+            <div className="image-container-single">
+              <motion.div
+                initial={{
+                  width: imageDetails.width,
+                  height: imageDetails.height,
+                  y: '-50%',
+                }}
+                animate={{
+                  y: 0,
+                  width: '100%',
+                  height: window.innerWidth > 1440 ? 800 : 400,
+                  transition: { delay: 0.2, ...transition },
+                }}
+                // {...{ transition }}
+                className="thumbnail-single"
+              >
+                <motion.div
+                  className="frame-single"
+                  whileHover="hover"
+                  transition={transition}
+                >
+                  <motion.img
+                    style={{ scale: scale }}
+                    initial={{ scale: 1 }}
+                    animate={{
+                      transition: { delay: 0.2, ...transition },
+                      y: window.innerWidth > 1440 ? -1100 : -600,
+                    }}
+                    src={require('../images/yasmeen.webp')}
+                    alt="an image"
+                  />
+                </motion.div>
+              </motion.div>
             </div>
           </div>
           <ScrollForMore />
         </div>
       </div>
-      <div className='detailed-information'>
-        <div className='container'>
-          <div className='row'>
-            <h2 className='title'>
+      <div className="detailed-information">
+        <div className="container">
+          <div className="row">
+            <h2 className="title">
               The insiration behind the artwork & <br /> what it means.
             </h2>
             <p>
@@ -72,8 +163,8 @@ const Model = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
-};
+    </motion.div>
+  )
+}
 
-export default Model;
+export default Model
